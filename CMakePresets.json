@@ -9,8 +9,7 @@
     {
       "name": "windows-x64-release",
       "displayName": "Windows x64 Release",
-      "generator": "Visual Studio 17 2022",
-      "architecture": "x64",
+      "generator": "Ninja Multi-Config",
       "binaryDir": "${sourceDir}/build/windows-x64-release",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
