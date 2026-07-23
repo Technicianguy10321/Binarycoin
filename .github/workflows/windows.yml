@@ -18,19 +18,29 @@ jobs:
         with:
           arch: amd64
 
-      - name: Configure
+      - name: Configure production release
         shell: pwsh
         run: |
           $env:VCPKG_ROOT = 'C:\vcpkg'
           cmake --preset windows-x64-release
 
-      - name: Build
+      - name: Build production release
         shell: pwsh
         run: cmake --build --preset windows-x64-release
 
+      - name: Configure fast tests
+        shell: pwsh
+        run: |
+          $env:VCPKG_ROOT = 'C:\vcpkg'
+          cmake --preset windows-x64-tests
+
+      - name: Build fast tests
+        shell: pwsh
+        run: cmake --build --preset windows-x64-tests
+
       - name: Test
         shell: pwsh
-        run: ctest --preset windows-x64-release
+        run: ctest --preset windows-x64-tests
 
       - name: Stage portable ZIP
         shell: pwsh

@@ -70,6 +70,9 @@ add_library(binarycoin_core
 )
 
 target_include_directories(binarycoin_core PUBLIC src)
+if(BINARYCOIN_FAST_TESTS)
+    target_compile_definitions(binarycoin_core PUBLIC BINARYCOIN_FAST_TESTS=1)
+endif()
 target_link_libraries(binarycoin_core PUBLIC OpenSSL::Crypto)
 if(BINARYCOIN_SECP_TARGET)
     target_link_libraries(binarycoin_core PUBLIC ${BINARYCOIN_SECP_TARGET})
@@ -123,6 +126,13 @@ if(BUILD_TESTING)
     target_link_libraries(binarycoin_rpc_tests PRIVATE binarycoin_core)
     binarycoin_warnings(binarycoin_rpc_tests)
     add_test(NAME binarycoin_rpc_alpha_v013 COMMAND binarycoin_rpc_tests)
+
+    set_tests_properties(
+        binarycoin_testnet_alpha_v013
+        binarycoin_bootstrap_alpha_v013
+        binarycoin_rpc_alpha_v013
+        PROPERTIES TIMEOUT 300
+    )
 
     if(NOT WIN32)
         add_executable(binarycoin_hardening_tests tests/network_hardening_tests.cpp)
