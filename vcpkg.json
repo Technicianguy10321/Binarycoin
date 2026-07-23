@@ -4,6 +4,7 @@
   "description": "BinaryCoin Testnet Alpha node and RPC client",
   "dependencies": [
     "openssl",
-    "secp256k1"
+    "secp256k1",
+    "boost-multiprecision"
   ]
 }
