@@ -96,6 +96,8 @@ void PeerStore::save() const {
     }
     output.flush();
     if (!output) throw std::runtime_error("Unable to flush peers.dat");
+    output.close();
+    if (output.fail()) throw std::runtime_error("Unable to close peers.dat");
     replace_file_atomically(temporary, path_);
 }
 

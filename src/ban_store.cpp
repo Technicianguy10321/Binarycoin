@@ -94,6 +94,8 @@ void BanStore::save() const {
     }
     output.flush();
     if (!output) throw std::runtime_error("Unable to flush banlist");
+    output.close();
+    if (output.fail()) throw std::runtime_error("Unable to close banlist");
     replace_file_atomically(temporary, path_);
 }
 

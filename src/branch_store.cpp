@@ -45,6 +45,8 @@ void SideBranchStore::save() const {
     }
     output.flush();
     if (!output) throw std::runtime_error("Unable to flush side-branch store");
+    output.close();
+    if (output.fail()) throw std::runtime_error("Unable to close side-branch store");
     replace_file_atomically(temporary, path_);
 }
 
