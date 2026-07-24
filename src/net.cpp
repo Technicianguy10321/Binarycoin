@@ -1115,7 +1115,6 @@ void PersistentTestnetNode::start() {
 
 void PersistentTestnetNode::request_stop() {
     stop_requested_ = true;
-    if (listen_socket_ != INVALID_SOCKET_VALUE) shutdown_socket(listen_socket_);
     std::lock_guard lock(session_state_mutex_);
     for (const Socket socket : active_sockets_) {
         shutdown_socket(socket);
@@ -1252,6 +1251,9 @@ void PersistentTestnetNode::start_session(
 
 void PersistentTestnetNode::accept_loop() {
     while (!stop_requested_) {
+        if (!wait_socket_readable(listen_socket_, 100)) continue;
+        if (stop_requested_) return;
+
         sockaddr_storage remote{};
         SocketLength remote_length = sizeof(remote);
         const Socket accepted = ::accept(
