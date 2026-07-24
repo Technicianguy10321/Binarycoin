@@ -44,12 +44,20 @@ class FileLock {
 public:
     explicit FileLock(const std::filesystem::path& path) {
 #ifdef _WIN32
-        handle_ = ::CreateFileW(
-            path.c_str(), GENERIC_READ | GENERIC_WRITE, 0, nullptr, OPEN_ALWAYS,
-            FILE_ATTRIBUTE_NORMAL, nullptr);
-        if (handle_ == INVALID_HANDLE_VALUE) {
-            throw std::runtime_error("Unable to lock chainstate. Windows error=" +
-                                     std::to_string(::GetLastError()));
+        while (true) {
+            handle_ = ::CreateFileW(
+                path.c_str(), GENERIC_READ | GENERIC_WRITE, 0, nullptr, OPEN_ALWAYS,
+                FILE_ATTRIBUTE_NORMAL, nullptr);
+            if (handle_ != INVALID_HANDLE_VALUE) break;
+
+            const DWORD error = ::GetLastError();
+            if (error != ERROR_SHARING_VIOLATION &&
+                error != ERROR_LOCK_VIOLATION) {
+                throw std::runtime_error(
+                    "Unable to lock chainstate. Windows error=" +
+                    std::to_string(error));
+            }
+            ::Sleep(5);
         }
 #else
         descriptor_ = ::open(path.c_str(), O_CREAT | O_RDWR | O_CLOEXEC, 0600);
