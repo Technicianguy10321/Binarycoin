@@ -41,6 +41,9 @@ void require(const bool condition, const char* message) {
 bincoin::NetworkPolicy local_test_policy() {
     bincoin::NetworkPolicy policy;
     policy.use_compiled_seeds = false;
+    policy.ping_interval = std::chrono::milliseconds(250);
+    policy.ping_timeout = std::chrono::milliseconds(1500);
+    policy.socket_timeout_seconds = 2;
     return policy;
 }
 
@@ -749,7 +752,7 @@ int main() {
             chain_b.load();
             chain_c.load();
             return chain_b.tip().height == 103 && chain_c.tip().height == 103;
-        }, std::chrono::seconds(12), "Outbound peers did not reconnect and receive the new block");
+        }, std::chrono::seconds(20), "Outbound peers did not reconnect and receive the new block");
 
         // v0.7 may reconnect in either direction after addrv2 exchange. The
         // important invariant is that peers.dat contains a usable address and

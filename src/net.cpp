@@ -1969,6 +1969,12 @@ void PersistentTestnetNode::session_loop(
             }
         } catch (const std::runtime_error& error) {
             const std::string message = error.what();
+            if (message.starts_with("recv failed:") ||
+                message.starts_with("send failed:") ||
+                message.starts_with("select failed:")) {
+                ++timeout_disconnects_;
+                return;
+            }
             if (message.find("closed") != std::string::npos ||
                 message.find("Connection reset") != std::string::npos ||
                 message.find("Broken pipe") != std::string::npos) {
