@@ -982,6 +982,10 @@ void TestnetP2pServer::handle_client(const Socket client_socket) {
 }
 
 void TestnetP2pServer::serve_once() {
+    while (!stop_requested_ && !wait_socket_readable(listen_socket_, 200)) {
+    }
+    if (stop_requested_) return;
+
     sockaddr_storage remote{};
     SocketLength remote_length = sizeof(remote);
     const Socket accepted = ::accept(listen_socket_, reinterpret_cast<sockaddr*>(&remote), &remote_length);
@@ -1007,9 +1011,6 @@ void TestnetP2pServer::serve_forever() {
 
 void TestnetP2pServer::request_stop() {
     stop_requested_ = true;
-    if (listen_socket_ != INVALID_SOCKET_VALUE) {
-        shutdown_socket(listen_socket_);
-    }
 }
 
 std::uint16_t TestnetP2pServer::bound_port() const noexcept { return port_; }
