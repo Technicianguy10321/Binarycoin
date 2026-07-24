@@ -285,7 +285,6 @@ void RpcServer::start() {
 
 void RpcServer::request_stop() {
     stop_requested_ = true;
-    if (listen_socket_ != INVALID_SOCKET_VALUE) shutdown_socket(listen_socket_);
 }
 
 void RpcServer::wait() {
@@ -300,6 +299,9 @@ std::uint16_t RpcServer::bound_port() const noexcept { return port_; }
 
 void RpcServer::accept_loop() {
     while (!stop_requested_) {
+        if (!wait_socket_readable(listen_socket_, 100)) continue;
+        if (stop_requested_) return;
+
         const Socket socket = ::accept(listen_socket_, nullptr, nullptr);
         if (socket == INVALID_SOCKET_VALUE) {
             if (stop_requested_) return;
