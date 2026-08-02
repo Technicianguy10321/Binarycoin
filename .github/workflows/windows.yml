@@ -1,0 +1,78 @@
+name: Windows x64
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    timeout-minutes: 90
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Enable MSVC x64
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: amd64
+
+      - name: Configure production release
+        shell: pwsh
+        run: |
+          $env:VCPKG_ROOT = 'C:\vcpkg'
+          cmake --preset windows-x64-release
+
+      - name: Build production release
+        shell: pwsh
+        run: cmake --build --preset windows-x64-release
+
+      - name: Configure fast tests
+        shell: pwsh
+        run: |
+          $env:VCPKG_ROOT = 'C:\vcpkg'
+          cmake --preset windows-x64-tests
+
+      - name: Build fast tests
+        shell: pwsh
+        run: cmake --build --preset windows-x64-tests
+
+      - name: Test
+        shell: pwsh
+        run: ctest --preset windows-x64-tests
+
+      - name: Stage portable ZIP
+        shell: pwsh
+        run: |
+          $stage = 'dist\BinaryCoin-Testnet-Alpha-v0.1.4-win64'
+          New-Item -ItemType Directory -Force $stage | Out-Null
+
+          Copy-Item 'build\windows-x64-release\binarycoind.exe' $stage
+          Copy-Item 'build\windows-x64-release\binarycoin-cli.exe' $stage
+          Copy-Item 'windows\start-binarycoin.cmd' $stage
+          Copy-Item 'windows\stop-binarycoin.cmd' $stage
+          Copy-Item 'windows\node-info.cmd' $stage
+          Copy-Item 'windows\show-logs.ps1' $stage
+          Copy-Item 'README-WINDOWS.md' $stage
+          Copy-Item 'LICENSE' $stage
+
+          Compress-Archive `
+            -Path "$stage\*" `
+            -DestinationPath 'dist\BinaryCoin-Testnet-Alpha-v0.1.4-win64.zip'
+
+          $zip = 'dist\BinaryCoin-Testnet-Alpha-v0.1.4-win64.zip'
+          $hash = (Get-FileHash -Algorithm SHA256 $zip).Hash.ToLowerInvariant()
+
+          Set-Content `
+            -Encoding ascii `
+            'dist\BinaryCoin-Testnet-Alpha-v0.1.4-win64.zip.sha256' `
+            "$hash  BinaryCoin-Testnet-Alpha-v0.1.4-win64.zip"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: BinaryCoin-Testnet-Alpha-v0.1.4-win64
+          path: |
+            dist/BinaryCoin-Testnet-Alpha-v0.1.4-win64.zip
+            dist/BinaryCoin-Testnet-Alpha-v0.1.4-win64.zip.sha256
+          if-no-files-found: error

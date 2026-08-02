@@ -1,0 +1,10 @@
+{
+  "name": "binarycoin-core",
+  "version-string": "0.1.4",
+  "description": "BinaryCoin Testnet Alpha node and RPC client",
+  "dependencies": [
+    "openssl",
+    "secp256k1",
+    "boost-multiprecision"
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 25,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "windows-x64-release",
+      "displayName": "Windows x64 Production Release",
+      "generator": "NMake Makefiles",
+      "binaryDir": "${sourceDir}/build/windows-x64-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_TOOLCHAIN_FILE": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
+        "VCPKG_TARGET_TRIPLET": "x64-windows-static",
+        "VCPKG_HOST_TRIPLET": "x64-windows",
+        "BINARYCOIN_REQUIRE_LIBSECP256K1": "ON",
+        "BINARYCOIN_STATIC_MSVC_RUNTIME": "ON",
+        "BINARYCOIN_FAST_TESTS": "OFF",
+        "BUILD_TESTING": "OFF"
+      }
+    },
+    {
+      "name": "windows-x64-tests",
+      "displayName": "Windows x64 Fast Tests",
+      "generator": "NMake Makefiles",
+      "binaryDir": "${sourceDir}/build/windows-x64-tests",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_TOOLCHAIN_FILE": "C:/vcpkg/scripts/buildsystems/vcpkg.cmake",
+        "VCPKG_TARGET_TRIPLET": "x64-windows-static",
+        "VCPKG_HOST_TRIPLET": "x64-windows",
+        "BINARYCOIN_REQUIRE_LIBSECP256K1": "ON",
+        "BINARYCOIN_STATIC_MSVC_RUNTIME": "ON",
+        "BINARYCOIN_FAST_TESTS": "ON",
+        "BUILD_TESTING": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "windows-x64-release",
+      "configurePreset": "windows-x64-release"
+    },
+    {
+      "name": "windows-x64-tests",
+      "configurePreset": "windows-x64-tests"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "windows-x64-tests",
+      "configurePreset": "windows-x64-tests",
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error",
+        "stopOnFailure": true
+      }
+    }
+  ]
+}
