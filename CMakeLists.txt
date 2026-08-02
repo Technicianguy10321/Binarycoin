@@ -15,8 +15,14 @@ if(MSVC AND BINARYCOIN_STATIC_MSVC_RUNTIME)
 endif()
 
 set(BINARYCOIN_SECP_TARGET "")
+
+# vcpkg currently exports libsecp256k1::secp256k1.
+find_package(libsecp256k1 CONFIG QUIET)
 find_package(secp256k1 CONFIG QUIET)
-if(TARGET secp256k1::secp256k1)
+
+if(TARGET libsecp256k1::secp256k1)
+    set(BINARYCOIN_SECP_TARGET libsecp256k1::secp256k1)
+elseif(TARGET secp256k1::secp256k1)
     set(BINARYCOIN_SECP_TARGET secp256k1::secp256k1)
 elseif(TARGET unofficial::secp256k1::secp256k1)
     set(BINARYCOIN_SECP_TARGET unofficial::secp256k1::secp256k1)
